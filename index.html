@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Cybersecurity Escape Room</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .score-board {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .scenario {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .scenario.active {
+            display: block;
+        }
+        
+        .scenario-header {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .scenario-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .scene-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .visual-scene {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .office-layout {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 10px;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .office-item {
+            background: #34495e;
+            border: 2px solid #7f8c8d;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .office-item:hover {
+            background: #4a6741;
+            transform: scale(1.05);
+        }
+        
+        .office-item.vulnerable {
+            border-color: #e74c3c;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+        }
+        
+        .office-item.secure {
+            border-color: #27ae60;
+            box-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
+        }
+        
+        .office-item.clicked {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .office-item.correct {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        .email-clickable:hover {
+            background: #e3f2fd !important;
+            transform: scale(1.02);
+        }
+        
+        .email-clickable.clicked {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .email-clickable.correct {
+            background: #c8e6c9 !important;
+            border: 2px solid #4caf50 !important;
+        }
+        
+        .password-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .password-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .password-result {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            text-align: center;
+            display: none;
+        }
+        
+        .password-result.correct {
+            border: 3px solid #27ae60;
+            color: #27ae60;
+        }
+        
+        .wire-clickable:hover {
+            background: #e3f2fd !important;
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+        
+        .wire-clickable.clicked {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .wire-clickable.correct {
+            background: #c8e6c9 !important;
+            border: 2px solid #4caf50 !important;
+        }
+        
+        .clickable-log {
+            cursor: pointer;
+            padding: 4px 8px;
+            margin: 2px 0;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .clickable-log:hover {
+            background: #333 !important;
+            border-left: 3px solid #00ff00;
+        }
+        
+        .clickable-log.clicked {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .clickable-log.correct {
+            background: #1b4d3e !important;
+            border-left: 3px solid #00ff00;
+        }
+        
+        .clickable-log.incorrect {
+            background: #4d1f1f !important;
+            border-left: 3px solid #ff6b6b;
+        }
+        
+        .email-visualization {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .email-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 15px -20px;
+        }
+        
+        .email-body {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            border: 1px solid #bdc3c7;
+        }
+        
+        .iot-device {
+            background: #34495e;
+            border: 2px solid #7f8c8d;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .iot-device:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .iot-device.vulnerable {
+            border-color: #e74c3c;
+            background: #c0392b;
+        }
+        
+        .iot-device.secure {
+            border-color: #27ae60;
+            background: #229954;
+        }
+        
+        .iot-device.clicked {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .iot-device.correct {
+            background: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        .iot-device.incorrect {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .smart-building-visual {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .building-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .feedback-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .feedback-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .feedback-header {
+            padding: 15px;
+            border-radius: 10px;
+            margin: -30px -30px 20px -30px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .feedback-header.correct {
+            background: #28a745;
+        }
+        
+        .feedback-header.incorrect {
+            background: #dc3545;
+        }
+        
+        .feedback-icon {
+            font-size: 3em;
+            margin: 15px 0;
+        }
+        
+        .feedback-explanation {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .vulnerability-hunt {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .selection-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .risk-button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+        
+        .risk-button.cybersecurity-risk {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .risk-button.cybersecurity-risk:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .risk-button.not-risk {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .risk-button.not-risk:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .risk-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .item-selected {
+            border: 3px solid #3498db !important;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.5) !important;
+        }
+        
+        .awaiting-selection {
+            background: #f39c12 !important;
+            color: white !important;
+        }
+        
+        .feedback {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .feedback.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .navigation {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn.close-modal {
+            background: #6c757d;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            background: #28a745;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .final-results {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .scenario-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .score-board {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .office-layout {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .building-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px;">
+                <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M8 11l2 2 4-4"/>
+                    </svg>
+                </div>
+                <h1>Real Estate Cybersecurity Training</h1>
+            </div>
+            <p style="margin-bottom: 8px;">Interactive learning based on real-world incidents: Alvin Housing Society & Connecticut wire fraud cases</p>
+            <div style="font-size: 0.8125rem; color: #64748b; font-weight: 500;">
+                Created by <span style="color: #3b82f6; font-weight: 600;">Mikhaeel Hoosen</span>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <div class="controls-row">
+                <div class="score-display">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                        </svg>
+                        <span>Score: <span id="score">0</span> / <span id="max-score">190</span></span>
+                    </div>
+                </div>
+                
+                <div class="scenario-nav">
+                    <button class="nav-btn active" onclick="jumpToScenario(1)">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>🏢</span>
+                            <span>Office Security</span>
+                        </div>
+                    </button>
+                    <button class="nav-btn" onclick="jumpToScenario(2)">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>📧</span>
+                            <span>Email Analysis</span>
+                        </div>
+                    </button>
+                    <button class="nav-btn" onclick="jumpToScenario(3)">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>🖥️</span>
+                            <span>System Breach</span>
+                        </div>
+                    </button>
+                    <button class="nav-btn" onclick="showFinalResults()">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>📊</span>
+                            <span>Results</span>
+                        </div>
+                    </button>
+                </div>
+                
+                <div class="vulnerability-counter">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                        <span><span id="vulnerabilities-found">0</span> / <span id="total-vulnerabilities">6</span> found</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 33%"></div>
+                </div>
+                <div class="progress-label">
+                    <span style="font-size: 0.75rem; color: #64748b; font-weight: 500;">Training Progress</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scenario 1: Property Management Office -->
+        <div class="scenario active" id="scenario1">
+            <div class="scenario-header">
+                <h2>🏢 Scenario 1: Property Management Office - Advanced Security Assessment</h2>
+                <p><strong>Context:</strong> Similar to Alvin Housing Society - conduct a thorough security audit</p>
+            </div>
+            
+            <div class="scenario-content">
+                <div class="scene-description">
+                    <h3>🔍 Your Mission:</h3>
+                    <p><strong>Real-World Connection:</strong> Alvin Housing Society suffered a ransomware attack that exposed tenant data.</p>
+                    <br>
+                    <p>🎯 <strong>Click items, then decide: security risk or safe?</strong></p>
+                </div>
+                
+                <div class="visual-scene">
+                    <h4>🏢 Office Environment - Click items to evaluate security risks</h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;">
+                        <div class="office-item" data-item="workstation" data-vulnerability="legacy-os" data-is-vulnerable="true">
+                            💻<br><strong>Manager's Workstation</strong><br><small>Windows Server 2008<br>Admin rights for all users</small>
+                        </div>
+                        <div class="office-item" data-item="password-policy" data-vulnerability="weak-policy" data-is-vulnerable="true">
+                            🔐<br><strong>Password Policy</strong><br><small>Min 6 characters<br>No complexity rules</small>
+                        </div>
+                        <div class="office-item" data-item="conference-room" data-vulnerability="none" data-is-vulnerable="false">
+                            🪑<br><strong>Conference Room</strong><br><small>Meeting table and chairs<br>Standard office furniture</small>
+                        </div>
+                        <div class="office-item" data-item="usb-ports" data-vulnerability="physical" data-is-vulnerable="true">
+                            🔌<br><strong>USB Ports</strong><br><small>No restrictions<br>Auto-run enabled</small>
+                        </div>
+                        <div class="office-item" data-item="filing-cabinet" data-vulnerability="encryption" data-is-vulnerable="true">
+                            🗄️<br><strong>Client Files Cabinet</strong><br><small>Unlocked cabinet<br>Contains SSNs & bank info</small>
+                        </div>
+                        <div class="office-item" data-item="vpn-config" data-vulnerability="network" data-is-vulnerable="true">
+                            🌐<br><strong>VPN Configuration</strong><br><small>Shared passwords<br>No 2FA required</small>
+                        </div>
+                        <div class="office-item" data-item="office-supplies" data-vulnerability="none" data-is-vulnerable="false">
+                            📎<br><strong>Supply Cabinet</strong><br><small>Paper, pens, staplers<br>Basic office supplies</small>
+                        </div>
+                        <div class="office-item" data-item="database-backup" data-vulnerability="encryption" data-is-vulnerable="true">
+                            💾<br><strong>Database Backup</strong><br><small>External drive<br>Unencrypted, labeled "Tenant DB"</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vulnerability-hunt">
+                <div id="selection-area-1" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 2px solid #3498db; margin: 20px 0;">
+                    <h3 style="text-align: center; color: #2c3e50;">📋 Selected Item: <span id="selected-item-name-1"></span></h3>
+                    <p style="text-align: center; font-size: 1.1em; margin: 15px 0;">Is this a cybersecurity risk?</p>
+                    <div class="selection-buttons">
+                        <button class="risk-button cybersecurity-risk" onclick="submitRiskAssessment(true)">
+                            🚨 CYBERSECURITY RISK
+                        </button>
+                        <button class="risk-button not-risk" onclick="submitRiskAssessment(false)">
+                            ✅ NOT A CYBERSECURITY RISK
+                        </button>
+                    </div>
+                </div>
+                
+                <h3>🎯 Goal: Evaluate all 8 items correctly</h3>
+                <p><strong>Scoring:</strong> +10 points per correct assessment, -5 points for incorrect</p>
+                <p><strong>Instructions:</strong> Click on any item above, then choose whether it's a cybersecurity risk or not!</p>
+            </div>
+            
+            <div class="feedback" id="feedback1"></div>
+        </div>
+        
+        <!-- Scenario 2: Phishing Email Attack -->
+        <div class="scenario" id="scenario2">
+            <div class="scenario-header">
+                <h2>📧 Scenario 2: Business Email Compromise - Wire Fraud Prevention</h2>
+                <p><strong>Context:</strong> Similar to Connecticut case - analyze a suspicious email for fraud indicators</p>
+            </div>
+            
+            <div class="scenario-content">
+                <div class="scene-description">
+                    <h3>🔍 Email Security Analysis:</h3>
+                    <p><strong>Real-World Connection:</strong> Connecticut homebuyer lost $600,000 to wire fraud via email.</p>
+                    <br>
+                    <p>🎯 <strong>Click SUSPICIOUS parts of the email. Avoid normal content.</strong></p>
+                </div>
+                
+                <div class="email-visualization">
+                    <div class="email-header">
+                        📧 Suspicious Email - Click on elements to analyze
+                    </div>
+                    <div class="email-body">
+                        <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 12px;">
+                            <strong>From:</strong> <span class="email-clickable" data-item="sender" data-vulnerability="spoofing" data-is-vulnerable="true">sarah.johnson@prestigereailty.com</span><br>
+                            <strong>To:</strong> <span class="email-clickable" data-item="recipient" data-vulnerability="none" data-is-vulnerable="false">buyer@email.com</span><br>
+                            <strong>Subject:</strong> <span class="email-clickable" data-item="subject" data-vulnerability="urgency" data-is-vulnerable="true">URGENT: Updated Wire Instructions</span><br>
+                            <strong>Date:</strong> <span class="email-clickable" data-item="date" data-vulnerability="none" data-is-vulnerable="false">March 15, 2024</span> <span class="email-clickable" data-item="time" data-vulnerability="none" data-is-vulnerable="false">4:47 PM (Friday)</span><br>
+                            <strong>Reply-To:</strong> <span class="email-clickable" data-item="reply-to" data-vulnerability="redirect" data-is-vulnerable="true">noreply.bankupdate@tempmail.net</span>
+                        </div>
+                        
+                        <p>Dear <span class="email-clickable" data-item="greeting" data-vulnerability="none" data-is-vulnerable="false">Mr. Peterson</span>,</p>
+                        
+                        <p><span class="email-clickable" data-item="emergency" data-vulnerability="pressure" data-is-vulnerable="true">Due to an EMERGENCY banking issue discovered today</span>, please disregard ALL previous wire instructions. <span class="email-clickable" data-item="bank-closure" data-vulnerability="bec-tactic" data-is-vulnerable="true">Our primary bank has suddenly terminated our account</span> due to <span class="email-clickable" data-item="excuse" data-vulnerability="vague" data-is-vulnerable="true">regulatory compliance issues</span>.</p>
+                        
+                        <p><span class="email-clickable" data-item="isolation" data-vulnerability="avoid-contact" data-is-vulnerable="true">DO NOT contact our office directly - our phones are down for maintenance</span>. Use ONLY these new details:</p>
+                        
+                        <div style="background: #f8fafc; padding: 12px; border-left: 3px solid #3b82f6; margin: 12px 0;">
+                            <strong>🏦 UPDATED WIRE INSTRUCTIONS:</strong><br>
+                            <strong>Bank:</strong> <span class="email-clickable" data-item="bank-name" data-vulnerability="none" data-is-vulnerable="false">First National Trust</span><br>
+                            <strong>Routing:</strong> <span class="email-clickable" data-item="routing" data-vulnerability="none" data-is-vulnerable="false">021000021</span><br>
+                            <strong>Account:</strong> <span class="email-clickable" data-item="account" data-vulnerability="personal" data-is-vulnerable="true">4456789012 (Personal Savings)</span><br>
+                            <strong>Amount:</strong> <span class="email-clickable" data-item="amount" data-vulnerability="none" data-is-vulnerable="false">$485,000</span><br>
+                            <strong>Reference:</strong> <span class="email-clickable" data-item="reference" data-vulnerability="no-verify" data-is-vulnerable="true">WIRE IMMEDIATELY - NO VERIFICATION NEEDED</span>
+                        </div>
+                        
+                        <p><span class="email-clickable" data-item="deadline" data-vulnerability="artificial-pressure" data-is-vulnerable="true">Please send wire within 2 hours or the property will be sold to another buyer!</span> <span class="email-clickable" data-item="threat" data-vulnerability="loss-threat" data-is-vulnerable="true">Any delay will result in loss of your earnest money deposit.</span></p>
+                        
+                        <p><span class="email-clickable" data-item="authentication" data-vulnerability="avoid-verification" data-is-vulnerable="true">For security, I cannot answer calls or verify this in person due to travel.</span></p>
+                        
+                        <p>Best regards,<br>
+                        <span class="email-clickable" data-item="signature-name" data-vulnerability="none" data-is-vulnerable="false">Sarah Johnson</span><br>
+                        <span class="email-clickable" data-item="title" data-vulnerability="none" data-is-vulnerable="false">Senior Real Estate Agent</span><br>
+                        <span class="email-clickable" data-item="company" data-vulnerability="none" data-is-vulnerable="false">Prestige Realty LLC</span></p>
+                        
+                        <div style="font-size: 0.75rem; color: #6b7280; margin-top: 16px; border-top: 1px solid #e2e8f0; padding-top: 8px;">
+                            <span class="email-clickable" data-item="disclaimer" data-vulnerability="misleading" data-is-vulnerable="true">This email was sent from a secure server. Do not reply to verify authenticity.</span><br>
+                            <span class="email-clickable" data-item="footer" data-vulnerability="strange-instruction" data-is-vulnerable="true">If you have received this email in error, please forward it to your bank immediately.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vulnerability-hunt">
+                <div class="selection-area" id="selection-area-2">
+                    <h3>📧 Selected: <span id="selected-item-name-2"></span></h3>
+                    <p>Is this suspicious?</p>
+                    <div class="selection-buttons">
+                        <button class="risk-button cybersecurity-risk" onclick="submitRiskAssessment(true)">
+                            🚨 SUSPICIOUS
+                        </button>
+                        <button class="risk-button not-risk" onclick="submitRiskAssessment(false)">
+                            ✅ NORMAL
+                        </button>
+                    </div>
+                </div>
+                
+                <h3>🎯 Find the 11 fraud indicators</h3>
+                <p><strong>Scoring:</strong> +7 points correct, -3 points wrong</p>
+            </div>
+            
+            <div class="feedback" id="feedback2"></div>
+        </div>
+        
+        <!-- Scenario 3: Property Management System Intrusion -->
+        <div class="scenario" id="scenario3">
+            <div class="scenario-header">
+                <h2>🖥️ Scenario 3: System Breach Investigation</h2>
+                <p><strong>Context:</strong> Your property management system was hacked. Find how they got in!</p>
+            </div>
+            
+            <div class="scenario-content">
+                <div class="scene-description">
+                    <h3>🔍 Forensic Investigation:</h3>
+                    <p><strong>Real-World Impact:</strong> Similar to Real Estate Wealth Network - 1.5 billion records exposed through poor security.</p>
+                    <br>
+                    <p>🎯 <strong>Review the system logs and identify what allowed the breach.</strong></p>
+                </div>
+                
+                <div style="background: #1a1a1a; color: #00ff00; padding: 30px; border-radius: 10px; min-height: 400px; font-family: 'Courier New', monospace;">
+                    <h4 style="color: #ffffff; margin-bottom: 20px;">🖥️ PROPERTY MANAGEMENT SYSTEM - SECURITY LOG</h4>
+                    
+                    <div id="terminal-output" style="background: #000; padding: 20px; border-radius: 5px; height: 350px; overflow-y: auto; font-size: 13px; line-height: 1.4;">
+                        <div class="log-entry clickable-log" data-item="database-access" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 09:15:23]</span> <span style="color: #00ff00;">LOG</span> - Database backup completed successfully
+                        </div>
+                        <div class="log-entry clickable-log" data-item="login-admin" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 09:32:41]</span> <span style="color: #00ff00;">LOG</span> - Admin user 'john.smith' logged in from 192.168.1.45
+                        </div>
+                        <div class="log-entry clickable-log" data-item="failed-attempts" data-vulnerability="brute-force" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 10:15:33]</span> <span style="color: #00ff00;">LOG</span> - 247 failed login attempts for user 'admin' from 203.0.113.42
+                        </div>
+                        <div class="log-entry clickable-log" data-item="update-patch" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 10:22:18]</span> <span style="color: #00ff00;">LOG</span> - Security patch KB2024-001 installed successfully
+                        </div>
+                        <div class="log-entry clickable-log" data-item="sql-injection" data-vulnerability="code-injection" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 11:43:27]</span> <span style="color: #00ff00;">LOG</span> - SQL query failed: SELECT * FROM tenants WHERE id='1' OR '1'='1'--
+                        </div>
+                        <div class="log-entry clickable-log" data-item="normal-query" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 11:45:12]</span> <span style="color: #00ff00;">LOG</span> - Property search completed for user 'client.portal'
+                        </div>
+                        <div class="log-entry clickable-log" data-item="privilege-escalation" data-vulnerability="unauthorized-access" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 12:08:54]</span> <span style="color: #00ff00;">LOG</span> - User 'guest' accessed admin panel without proper authorization
+                        </div>
+                        <div class="log-entry clickable-log" data-item="file-upload" data-vulnerability="malicious-upload" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 12:15:38]</span> <span style="color: #00ff00;">LOG</span> - Suspicious file uploaded: 'invoice.pdf.exe' by user 'tenant.portal'
+                        </div>
+                        <div class="log-entry clickable-log" data-item="backup-routine" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 12:30:00]</span> <span style="color: #00ff00;">LOG</span> - Automated tenant data backup initiated
+                        </div>
+                        <div class="log-entry clickable-log" data-item="data-exfiltration" data-vulnerability="data-theft" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 13:22:17]</span> <span style="color: #00ff00;">LOG</span> - Large data transfer detected: 2.4GB to external IP 198.51.100.88
+                        </div>
+                        <div class="log-entry clickable-log" data-item="encryption-bypass" data-vulnerability="security-bypass" data-is-vulnerable="true">
+                            <span style="color: #888;">[2024-03-15 13:35:42]</span> <span style="color: #00ff00;">LOG</span> - Database accessed without encryption: table 'tenant_ssn'
+                        </div>
+                        <div class="log-entry clickable-log" data-item="normal-logout" data-vulnerability="none" data-is-vulnerable="false">
+                            <span style="color: #888;">[2024-03-15 14:15:55]</span> <span style="color: #00ff00;">LOG</span> - User 'john.smith' logged out successfully
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #2a2a2a; border-radius: 5px;">
+                        <h5 style="color: #ffffff; margin-bottom: 10px;">🔍 Investigation Status:</h5>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; color: #cccccc; font-size: 12px;">
+                            <div>🔴 Critical Events: <span id="critical-count">0</span>/6</div>
+                            <div>✅ Normal Events: <span id="normal-count">0</span>/6</div>
+                            <div>📊 Analysis: <span id="analysis-progress">0</span>%</div>
+                        </div>
+                        <div style="background: #1a1a1a; height: 8px; border-radius: 4px; margin: 10px 0; overflow: hidden;">
+                            <div id="investigation-progress" style="background: #00ff00; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="vulnerability-hunt">
+                <div class="selection-area" id="selection-area-3">
+                    <h3>🖥️ Selected: <span id="selected-item-name-3"></span></h3>
+                    <p>Is this part of the attack?</p>
+                    <div class="selection-buttons">
+                        <button class="risk-button cybersecurity-risk" onclick="submitRiskAssessment(true)">
+                            🚨 ATTACK INDICATOR
+                        </button>
+                        <button class="risk-button not-risk" onclick="submitRiskAssessment(false)">
+                            ✅ NORMAL ACTIVITY
+                        </button>
+                    </div>
+                </div>
+                
+                <h3>🎯 Find the 6 attack indicators</h3>
+                <p><strong>Scoring:</strong> +10 points correct, -5 points wrong</p>
+                <div style="background: #e0f2fe; padding: 12px; border-radius: 6px; margin-top: 12px; border-left: 3px solid #0284c7;">
+                    <strong>🔍 Look for:</strong> Failed logins, suspicious queries, unauthorized access, malicious files, data theft
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback3"></div>
+        </div>
+        
+        <!-- Final Results -->
+        <div class="scenario" id="final-results">
+            <div class="final-results">
+                <h2>🎉 Cybersecurity Escape Room Complete!</h2>
+                <div id="final-score-display"></div>
+                <div id="performance-analysis"></div>
+                
+                <div style="background: #e8f5e8; border: 1px solid #c3e6cb; border-radius: 10px; padding: 20px; margin: 30px 0;">
+                    <h3>📋 Complete Learning Coverage Achieved:</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>✅ Legacy systems and software vulnerabilities</div>
+                        <div>✅ Physical security and access controls</div>
+                        <div>✅ Business Email Compromise detection</div>
+                        <div>✅ Social engineering tactics recognition</div>
+                        <div>✅ IoT device security assessment</div>
+                        <div>✅ Network segmentation importance</div>
+                    </div>
+                </div>
+                
+                <h3>📚 Key Lessons from Real-World Cases:</h3>
+                <ul style="text-align: left; max-width: 800px; margin: 20px auto;">
+                    <li><strong>Alvin Housing Society:</strong> Legacy systems created entry points for ransomware</li>
+                    <li><strong>Connecticut Wire Fraud:</strong> Email security gaps cost $600,000 in losses</li>
+                    <li><strong>Smart Buildings:</strong> IoT devices expand attack surfaces without proper security</li>
+                    <li><strong>Employee Training:</strong> Human factors often determine security success</li>
+                </ul>
+                <button class="btn" onclick="restartGame()">🔄 Play Again</button>
+            </div>
+        </div>
+        
+        <!-- Feedback Modal -->
+        <div class="feedback-modal" id="feedback-modal">
+            <div class="feedback-content">
+                <div class="feedback-header" id="feedback-header">
+                    <h3 id="feedback-title">Feedback</h3>
+                </div>
+                <div class="feedback-icon" id="feedback-icon">✅</div>
+                <div id="feedback-message"></div>
+                <div class="feedback-explanation" id="feedback-explanation"></div>
+                <button class="btn close-modal" onclick="closeFeedbackModal()">Continue</button>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="btn" id="prevBtn" onclick="changeScenario(-1)" disabled>← Previous</button>
+            <button class="btn" id="nextBtn" onclick="changeScenario(1)">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        // Remove password game code and replace with vulnerability counter logic
+        let selectedItem = null;
+        let currentScenario = 1;
+        let totalScenarios = 3;
+        let score = 0;
+        let gameTimer;
+        let scenarioCompleted = [false, false, false];
+        
+        // Vulnerability tracking with detailed scoring
+        let vulnerabilityCounts = {
+            1: { found: 0, total: 6 }, // Office scenario
+            2: { found: 0, total: 11 }, // Email scenario  
+            3: { found: 0, total: 6 }  // System breach scenario
+        };
+        
+        // Maximum possible score calculation:
+        // Scenario 1: 6 vulnerabilities × 10 points + 15 completion bonus = 75 points
+        // Scenario 2: 11 vulnerabilities × 7 points + 15 completion bonus = 92 points  
+        // Scenario 3: 6 vulnerabilities × 10 points + 15 completion bonus = 75 points
+        // Total maximum: 190 + 45 completion bonuses = 242 points
+        const MAX_SCORE = 242;
+        
+        // Detailed scoring rubric
+        const SCORING_RUBRIC = {
+            excellent: { min: 195, max: 242, grade: 'A+', title: 'Cybersecurity Expert', description: 'Outstanding performance with minimal errors' },
+            proficient: { min: 170, max: 194, grade: 'A', title: 'Security Analyst', description: 'Strong cybersecurity awareness with good threat recognition' },
+            competent: { min: 145, max: 169, grade: 'B+', title: 'Cyber Detective', description: 'Good understanding with some missed vulnerabilities' },
+            developing: { min: 120, max: 144, grade: 'B', title: 'Security Trainee', description: 'Basic awareness but needs improvement in threat identification' },
+            novice: { min: 95, max: 119, grade: 'C', title: 'Beginner', description: 'Limited cybersecurity knowledge, significant training needed' },
+            insufficient: { min: 0, max: 94, grade: 'D', title: 'High Risk', description: 'Inadequate threat recognition, immediate training required' }
+        };
+        
+        function updateVulnerabilityCounter() {
+            const current = vulnerabilityCounts[currentScenario];
+            document.getElementById('vulnerabilities-found').textContent = current.found;
+            document.getElementById('total-vulnerabilities').textContent = current.total;
+        }
+        
+        function selectItem(item) {
+            // Remove previous selection
+            document.querySelectorAll('.item-selected').forEach(el => {
+                el.classList.remove('item-selected', 'awaiting-selection');
+            });
+            
+            // If item is already clicked, don't allow reselection
+            if (item.classList.contains('clicked')) {
+                return;
+            }
+            
+            // Select new item and add visual feedback
+            item.classList.add('item-selected', 'awaiting-selection');
+            selectedItem = item;
+            
+            // Determine which scenario we're in
+            const scenarioElement = item.closest('.scenario');
+            if (!scenarioElement) return;
+            
+            const scenarioNum = parseInt(scenarioElement.id.replace('scenario', ''));
+            const selectionAreaId = `selection-area-${scenarioNum}`;
+            const itemNameId = `selected-item-name-${scenarioNum}`;
+            
+            // Show selection area
+            const selectionArea = document.getElementById(selectionAreaId);
+            const itemName = document.getElementById(itemNameId);
+            
+            if (selectionArea && itemName) {
+                selectionArea.style.display = 'block';
+                // Extract clean item name from the element
+                const itemText = item.textContent.trim();
+                const cleanName = itemText.split('\n')[0] || itemText.substring(0, 50) + '...';
+                itemName.textContent = cleanName;
+                
+                // Scroll to selection area
+                selectionArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        function jumpToScenario(scenarioNumber) {
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            if (scenarioNumber <= 3) {
+                document.querySelectorAll('.nav-btn')[scenarioNumber - 1].classList.add('active');
+            }
+            
+            // Hide all scenarios
+            document.querySelectorAll('.scenario').forEach(scenario => {
+                scenario.classList.remove('active');
+            });
+            
+            if (scenarioNumber === 4) {
+                showFinalResults();
+                return;
+            }
+            
+            // Show the requested scenario
+            const targetScenario = document.getElementById(`scenario${scenarioNumber}`);
+            
+            if (targetScenario) {
+                targetScenario.classList.add('active');
+                currentScenario = scenarioNumber;
+                updateProgress();
+                updateNavigationButtons();
+                updateVulnerabilityCounter();
+            }
+        }
+        
+        function changeScenario(direction) {
+            const scenarios = document.querySelectorAll('.scenario');
+            scenarios[currentScenario - 1].classList.remove('active');
+            
+            currentScenario += direction;
+            
+            if (currentScenario > totalScenarios) {
+                showFinalResults();
+                return;
+            }
+            
+            if (currentScenario < 1) {
+                currentScenario = 1;
+                return;
+            }
+            
+            scenarios[currentScenario - 1].classList.add('active');
+            
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-btn')[currentScenario - 1].classList.add('active');
+            
+            updateProgress();
+            updateNavigationButtons();
+            updateVulnerabilityCounter();
+        }
+        
+        function updateNavigationButtons() {
+            document.getElementById('prevBtn').disabled = currentScenario === 1;
+            document.getElementById('nextBtn').disabled = false;
+            
+            if (currentScenario === totalScenarios) {
+                document.getElementById('nextBtn').textContent = 'Finish 🏁';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next ➡';
+            }
+        }
+        
+        function submitRiskAssessment(userThinksCybersecurityRisk) {
+            if (!selectedItem) return;
+            
+            const isActuallyVulnerable = selectedItem.dataset.isVulnerable === 'true';
+            const isCorrect = userThinksCybersecurityRisk === isActuallyVulnerable;
+            const scenarioNum = parseInt(selectedItem.closest('.scenario').id.replace('scenario', ''));
+            const itemName = selectedItem.textContent.trim();
+            
+            selectedItem.classList.remove('item-selected', 'awaiting-selection');
+            selectedItem.classList.add('clicked');
+            
+            if (isCorrect) {
+                selectedItem.classList.add('correct');
+                const points = getPointsForScenario(scenarioNum);
+                updateScore(points);
+                
+                // Update vulnerability counter if it's a correctly identified vulnerability
+                if (isActuallyVulnerable) {
+                    vulnerabilityCounts[scenarioNum].found++;
+                    updateVulnerabilityCounter();
+                }
+                
+                if (isActuallyVulnerable) {
+                    const explanation = getVulnerabilityExplanation(selectedItem.dataset.vulnerability || selectedItem.dataset.issue);
+                    showFeedbackModal(true, 
+                        `Correct! This IS a security risk!`, 
+                        `+${points} points`, 
+                        `🔍 Why this is dangerous: ${explanation}`);
+                } else {
+                    showFeedbackModal(true,
+                        `Correct! This is NOT a security risk!`,
+                        `+${points} points`,
+                        `✅ You correctly identified normal system activity. Good judgment!`);
+                }
+            } else {
+                selectedItem.classList.add('incorrect');
+                updateScore(-5);
+                
+                if (isActuallyVulnerable) {
+                    const explanation = getVulnerabilityExplanation(selectedItem.dataset.vulnerability || selectedItem.dataset.issue);
+                    showFeedbackModal(false,
+                        `Incorrect - This IS a security risk!`,
+                        `-5 points`,
+                        `🔍 Why this is actually dangerous: ${explanation}`);
+                } else {
+                    showFeedbackModal(false,
+                        `Incorrect - This is NOT a security risk!`,
+                        `-5 points`,
+                        `This represents normal system activity. Focus on suspicious patterns and security violations.`);
+                }
+            }
+            
+            // Hide all selection areas
+            document.querySelectorAll('[id^="selection-area-"]').forEach(area => {
+                area.style.display = 'none';
+            });
+            selectedItem = null;
+            
+            // Update scenario 3 progress counters if applicable
+            if (scenarioNum === 3) {
+                updateInvestigationProgress();
+            }
+            
+            checkScenarioCompletion(scenarioNum);
+        }
+        
+        function updateInvestigationProgress() {
+            const scenario3 = document.getElementById('scenario3');
+            if (!scenario3) return;
+            
+            const allLogs = scenario3.querySelectorAll('.clickable-log');
+            const clickedLogs = scenario3.querySelectorAll('.clickable-log.clicked');
+            const correctCritical = scenario3.querySelectorAll('.clickable-log[data-is-vulnerable="true"].correct');
+            const correctNormal = scenario3.querySelectorAll('.clickable-log[data-is-vulnerable="false"].correct');
+            
+            const criticalCountEl = document.getElementById('critical-count');
+            const normalCountEl = document.getElementById('normal-count');
+            const progressEl = document.getElementById('analysis-progress');
+            const progressBarEl = document.getElementById('investigation-progress');
+            
+            if (criticalCountEl) criticalCountEl.textContent = correctCritical.length;
+            if (normalCountEl) normalCountEl.textContent = correctNormal.length;
+            
+            const progress = allLogs.length > 0 ? (clickedLogs.length / allLogs.length) * 100 : 0;
+            if (progressEl) progressEl.textContent = Math.round(progress);
+            if (progressBarEl) progressBarEl.style.width = progress + '%';
+        }
+        
+        // Remove all timer-related functions
+        // Enhanced error handling for DOM elements
+        function safeGetElement(id) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.warn(`Element with id '${id}' not found`);
+            }
+            return element;
+        }
+        
+        function updateScore(points) {
+            score += points;
+            const scoreElement = safeGetElement('score');
+            if (scoreElement) {
+                scoreElement.textContent = score;
+                
+                // Add visual feedback for score changes
+                if (points > 0) {
+                    scoreElement.style.transform = 'scale(1.1)';
+                    scoreElement.style.color = '#10b981';
+                    setTimeout(() => {
+                        scoreElement.style.transform = 'scale(1)';
+                        scoreElement.style.color = '';
+                    }, 300);
+                } else if (points < 0) {
+                    scoreElement.style.transform = 'scale(0.9)';
+                    scoreElement.style.color = '#dc2626';
+                    setTimeout(() => {
+                        scoreElement.style.transform = 'scale(1)';
+                        scoreElement.style.color = '';
+                    }, 300);
+                }
+            }
+        }
+        
+        function updateProgress() {
+            const progress = ((currentScenario - 1) / totalScenarios) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+        
+        // Handle all interactive element clicks
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('office-item') || e.target.classList.contains('iot-device')) {
+                selectItem(e.target);
+            } else if (e.target.classList.contains('email-clickable')) {
+                selectItem(e.target);
+            } else if (e.target.classList.contains('clickable-log')) {
+                selectItem(e.target);
+            }
+        });
+        
+        function showFeedbackModal(isCorrect, title, score, explanation) {
+            const modal = document.getElementById('feedback-modal');
+            const header = document.getElementById('feedback-header');
+            const titleEl = document.getElementById('feedback-title');
+            const icon = document.getElementById('feedback-icon');
+            const message = document.getElementById('feedback-message');
+            const explanationEl = document.getElementById('feedback-explanation');
+            
+            header.className = isCorrect ? 'feedback-header correct' : 'feedback-header incorrect';
+            titleEl.textContent = title;
+            icon.textContent = isCorrect ? '✅' : '❌';
+            message.innerHTML = `<strong>${score}</strong>`;
+            explanationEl.textContent = explanation;
+            
+            modal.style.display = 'flex';
+        }
+        
+        function closeFeedbackModal() {
+            document.getElementById('feedback-modal').style.display = 'none';
+        }
+        
+        function getPointsForScenario(scenarioNum) {
+            const points = {1: 10, 2: 7, 3: 10};
+            return points[scenarioNum] || 5;
+        }
+        
+        function checkScenarioCompletion(scenarioNum) {
+            const scenario = document.getElementById(`scenario${scenarioNum}`);
+            const allItems = scenario.querySelectorAll('[data-is-vulnerable]');
+            const clickedItems = scenario.querySelectorAll('[data-is-vulnerable].clicked');
+            
+            if (allItems.length === clickedItems.length && allItems.length > 0) {
+                scenarioCompleted[scenarioNum - 1] = true;
+                updateScore(15); // Completion bonus
+                showFeedbackModal(true, 
+                    `🎉 Scenario Complete!`, 
+                    `+15 bonus points!`, 
+                    `Congratulations! You evaluated all items in this scenario. You're developing strong cybersecurity awareness skills!`);
+            }
+        }
+        
+        function getVulnerabilityExplanation(vulnerability) {
+            const explanations = {
+                'legacy-os': 'Windows Server 2008 is severely outdated with known vulnerabilities.',
+                'weak-policy': 'Weak password policies make brute force attacks easy.',
+                'physical': 'Open USB ports allow malware installation via infected devices.',
+                'encryption': 'Unencrypted sensitive data can be easily accessed if compromised.',
+                'network': 'Shared VPN passwords create a single point of failure.',
+                'spoofing': 'Domain spoofing - "reailty" instead of "realty" is a common fraud tactic.',
+                'urgency': 'Urgent subject lines create pressure to bypass verification.',
+                'timing': 'Friday evening timing prevents verification when businesses are closed.',
+                'redirect': 'Reply-to redirects to different domain - allows attackers to receive responses.',
+                'pressure': 'Emergency language bypasses rational decision-making.',
+                'bec-tactic': 'Sudden banking changes are classic Business Email Compromise tactics.',
+                'vague': 'Vague excuses create urgency without verifiable details.',
+                'avoid-contact': 'Instructions to avoid normal contact prevent verification.',
+                'personal': 'Personal savings accounts are red flags for business transfers.',
+                'no-verify': 'Instructions stating "no verification needed" contradict security protocols.',
+                'artificial-pressure': 'Artificial deadlines prevent proper verification.',
+                'loss-threat': 'Threats about losing money pressure quick action.',
+                'avoid-verification': 'Claims about inability to verify eliminate security checks.',
+                'misleading': 'Disclaimers about security while discouraging verification are suspicious.',
+                'strange-instruction': 'Instructions to forward to bank instead of verifying is unusual.',
+                'personal-account': 'Personal checking accounts for business transactions are major red flags.',
+                'individual-name': 'Individual names instead of company names indicate potential fraud.',
+                'artificial-deadline': 'Artificial deadlines create pressure to bypass verification.',
+                'isolation': 'Instructions to avoid normal contact methods prevent verification.',
+                'suspicious-number': 'Emergency numbers that avoid normal business channels are suspicious.',
+                'brute-force': 'Multiple failed login attempts indicate automated password cracking attacks.',
+                'code-injection': 'SQL injection attempts show attackers trying to manipulate database queries.',
+                'unauthorized-access': 'Guest users accessing admin panels indicates privilege escalation attacks.',
+                'malicious-upload': 'Executable files disguised as documents are common malware delivery methods.',
+                'data-theft': 'Large unexpected data transfers to external IPs indicate data exfiltration.',
+                'security-bypass': 'Accessing encrypted data without proper authentication shows security controls were bypassed.',
+                'open-network': 'Open WiFi networks allow unauthorized access and monitoring.',
+                'default-admin': 'Default admin credentials are easily exploited by attackers.',
+                'visible-password': 'Visible passwords on sticky notes compromise security.',
+                'outdated': 'Outdated firmware contains known security vulnerabilities.',
+                'unpatched': 'Unpatched systems are vulnerable to known exploits.',
+                'default-password': 'Default passwords are easily guessed by automated tools.',
+                'firmware': 'Outdated firmware contains published vulnerabilities.',
+                'monitoring': 'Devices without monitoring can be compromised undetected.'
+            };
+            
+            return explanations[vulnerability] || 'This represents a security risk that could be exploited.';
+        }
+        
+        function endGame() {
+            clearInterval(gameTimer);
+            showFinalResults();
+        }
+        
+        function showFinalResults() {
+            const scenarios = document.querySelectorAll('.scenario');
+            scenarios.forEach(s => s.classList.remove('active'));
+            
+            const finalResults = safeGetElement('final-results');
+            if (finalResults) {
+                finalResults.classList.add('active');
+            }
+            
+            const navigation = document.querySelector('.navigation');
+            if (navigation) {
+                navigation.style.display = 'none';
+            }
+            
+            // Calculate detailed performance metrics
+            const totalVulnerabilitiesFound = Object.values(vulnerabilityCounts).reduce((sum, scenario) => sum + scenario.found, 0);
+            const totalVulnerabilities = Object.values(vulnerabilityCounts).reduce((sum, scenario) => sum + scenario.total, 0);
+            const completedScenarios = scenarioCompleted.filter(Boolean).length;
+            const accuracyRate = totalVulnerabilities > 0 ? (totalVulnerabilitiesFound / totalVulnerabilities * 100).toFixed(1) : 0;
+            
+            // Determine performance level based on score
+            let performanceLevel = SCORING_RUBRIC.insufficient;
+            for (const [key, rubric] of Object.entries(SCORING_RUBRIC)) {
+                if (score >= rubric.min && score <= rubric.max) {
+                    performanceLevel = rubric;
+                    break;
+                }
+            }
+            
+            // Calculate percentage score
+            const percentageScore = ((score / MAX_SCORE) * 100).toFixed(1);
+            
+            const finalScoreDisplay = safeGetElement('final-score-display');
+            const performanceAnalysis = safeGetElement('performance-analysis');
+            
+            if (finalScoreDisplay) {
+                finalScoreDisplay.innerHTML = `
+                    <div style="background: linear-gradient(135deg, ${getGradeColor(performanceLevel.grade)}, ${getGradeColorSecondary(performanceLevel.grade)}); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px;">
+                        <h3 style="font-size: 2rem; margin-bottom: 8px;">${performanceLevel.grade}</h3>
+                        <p style="font-size: 1.125rem; opacity: 0.9;">${performanceLevel.title}</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">${score}</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Total Score</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">${percentageScore}%</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Percentage</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">${totalVulnerabilitiesFound}/${totalVulnerabilities}</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Vulnerabilities Found</div>
+                        </div>
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">${accuracyRate}%</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Accuracy Rate</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (performanceAnalysis) {
+                performanceAnalysis.innerHTML = `
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 24px;">
+                        <h4 style="color: #1e293b; margin-bottom: 12px;">📊 Performance Analysis</h4>
+                        <p style="color: #64748b; margin-bottom: 16px;">${performanceLevel.description}</p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <h5 style="color: #1e293b; margin-bottom: 8px;">Scenario Breakdown:</h5>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                                <div style="padding: 12px; background: white; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                                    <div style="font-weight: 600; color: #1e293b;">Office Security</div>
+                                    <div style="font-size: 0.875rem; color: #64748b;">${vulnerabilityCounts[1].found}/${vulnerabilityCounts[1].total} found</div>
+                                </div>
+                                <div style="padding: 12px; background: white; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                    <div style="font-weight: 600; color: #1e293b;">Email Analysis</div>
+                                    <div style="font-size: 0.875rem; color: #64748b;">${vulnerabilityCounts[2].found}/${vulnerabilityCounts[2].total} found</div>
+                                </div>
+                                <div style="padding: 12px; background: white; border-radius: 8px; border-left: 4px solid #10b981;">
+                                    <div style="font-weight: 600; color: #1e293b;">System Breach</div>
+                                    <div style="font-size: 0.875rem; color: #64748b;">${vulnerabilityCounts[3].found}/${vulnerabilityCounts[3].total} found</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${generateRecommendations(performanceLevel, totalVulnerabilitiesFound, totalVulnerabilities)}
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+                        <h4 style="color: #1e293b; margin-bottom: 16px;">📈 Grading Rubric</h4>
+                        <div style="display: grid; gap: 8px;">
+                            ${Object.entries(SCORING_RUBRIC).map(([key, rubric]) => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: ${score >= rubric.min && score <= rubric.max ? 'white' : 'transparent'}; border-radius: 6px; border-left: 3px solid ${score >= rubric.min && score <= rubric.max ? getGradeColor(rubric.grade) : '#e2e8f0'};">
+                                    <span style="font-weight: ${score >= rubric.min && score <= rubric.max ? '600' : '400'}; color: ${score >= rubric.min && score <= rubric.max ? '#1e293b' : '#64748b'};">${rubric.grade} - ${rubric.title}</span>
+                                    <span style="font-size: 0.875rem; color: #64748b;">${rubric.min}-${rubric.max} points</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function getGradeColor(grade) {
+            const colors = {
+                'A+': '#10b981', 'A': '#059669', 'B+': '#3b82f6', 'B': '#2563eb', 
+                'C': '#f59e0b', 'D': '#dc2626'
+            };
+            return colors[grade] || '#6b7280';
+        }
+        
+        function getGradeColorSecondary(grade) {
+            const colors = {
+                'A+': '#059669', 'A': '#047857', 'B+': '#2563eb', 'B': '#1d4ed8', 
+                'C': '#d97706', 'D': '#b91c1c'
+            };
+            return colors[grade] || '#4b5563';
+        }
+        
+        function generateRecommendations(performanceLevel, found, total) {
+            const recommendations = {
+                excellent: [
+                    "🌟 Exceptional cybersecurity awareness!",
+                    "💼 Consider pursuing advanced cybersecurity certifications",
+                    "👥 You could mentor others in threat identification"
+                ],
+                proficient: [
+                    "✅ Strong foundation in cybersecurity principles",
+                    "📚 Review scenarios where vulnerabilities were missed",
+                    "🎯 Focus on advanced threat detection techniques"
+                ],
+                competent: [
+                    "📈 Good progress, but room for improvement",
+                    "🔍 Practice identifying subtle social engineering tactics",
+                    "💡 Review common attack vectors in real estate"
+                ],
+                developing: [
+                    "📖 Basic understanding needs strengthening",
+                    "🏆 Complete additional cybersecurity training modules",
+                    "👨‍🏫 Consider working with a cybersecurity mentor"
+                ],
+                novice: [
+                    "🚀 Starting point for cybersecurity learning journey",
+                    "📚 Begin with fundamental cybersecurity courses",
+                    "⚠️ Focus on recognizing obvious threats first"
+                ],
+                insufficient: [
+                    "⚠️ Immediate cybersecurity training required",
+                    "🎓 Enroll in comprehensive security awareness program",
+                    "🔒 Avoid handling sensitive data until properly trained"
+                ]
+            };
+            
+            const recs = recommendations[Object.keys(SCORING_RUBRIC).find(key => 
+                score >= SCORING_RUBRIC[key].min && score <= SCORING_RUBRIC[key].max
+            )] || recommendations.insufficient;
+            
+            return `
+                <div>
+                    <h5 style="color: #1e293b; margin-bottom: 8px;">💡 Recommendations:</h5>
+                    <ul style="margin: 0; padding-left: 20px; color: #64748b; font-size: 0.875rem; line-height: 1.6;">
+                        ${recs.map(rec => `<li style="margin-bottom: 4px;">${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        function restartGame() {
+            currentScenario = 1;
+            score = 0;
+            selectedItem = null;
+            scenarioCompleted = [false, false, false];
+            
+            // Reset vulnerability counters
+            vulnerabilityCounts = {
+                1: { found: 0, total: 6 },
+                2: { found: 0, total: 11 },
+                3: { found: 0, total: 6 }
+            };
+            
+            document.getElementById('score').textContent = '0';
+            document.getElementById('max-score').textContent = MAX_SCORE;
+            updateProgress();
+            updateVulnerabilityCounter();
+            
+            // Reset all interactive elements
+            document.querySelectorAll('.office-item, .iot-device, .email-clickable, .clickable-log').forEach(item => {
+                item.classList.remove('correct', 'incorrect', 'clicked', 'item-selected', 'awaiting-selection');
+                item.style.pointerEvents = 'auto';
+                item.style.visibility = 'visible';
+                item.style.opacity = '1';
+                item.style.transform = 'scale(1)';
+            });
+            
+            // Hide all feedback and selection areas
+            document.querySelectorAll('.feedback').forEach(feedback => {
+                feedback.style.display = 'none';
+            });
+            
+            document.querySelectorAll('[id^="selection-area-"]').forEach(area => {
+                area.style.display = 'none';
+            });
+            
+            // Show first scenario
+            document.querySelectorAll('.scenario').forEach(s => s.classList.remove('active'));
+            document.getElementById('scenario1').classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-btn')[0].classList.add('active');
+            
+            // Show navigation
+            document.querySelector('.navigation').style.display = 'block';
+            updateNavigationButtons();
+        }
+        
+        // Initialize game with error handling
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const maxScoreElement = safeGetElement('max-score');
+                if (maxScoreElement) {
+                    maxScoreElement.textContent = MAX_SCORE;
+                }
+                
+                updateNavigationButtons();
+                updateProgress();
+                updateVulnerabilityCounter();
+                
+                console.log('🎯 Real Estate Cybersecurity Training initialized successfully');
+                console.log(`📊 Maximum possible score: ${MAX_SCORE} points`);
+                console.log('🔧 All systems ready');
+            } catch (error) {
+                console.error('❌ Error initializing application:', error);
+            }
+        });
+    </script>
+</body>
+</html>
